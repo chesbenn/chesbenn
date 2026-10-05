@@ -1,0 +1,76 @@
+{
+ "format": "providercore-design",
+ "version": 1,
+ "name": "Сохранность A",
+ "exported_at": "2026-10-05T12:56:24.923Z",
+ "data": {
+  "nodes": [
+   {
+    "id": "olt",
+    "type": "olt",
+    "x": 120,
+    "y": 300,
+    "label": "OLT",
+    "props": {
+     "name": "OLT"
+    }
+   },
+   {
+    "id": "ebdx472",
+    "type": "ont",
+    "x": -20,
+    "y": 140,
+    "label": "ONT",
+    "props": {
+     "name": "ONT 1"
+    }
+   },
+   {
+    "id": "eltg03e",
+    "type": "ont",
+    "x": 40,
+    "y": 140,
+    "label": "ONT",
+    "props": {
+     "name": "ONT 2"
+    }
+   },
+   {
+    "id": "vtsw86t",
+    "type": "ont",
+    "x": 120,
+    "y": 140,
+    "label": "ONT",
+    "props": {
+     "name": "ONT 3"
+    }
+   },
+   {
+    "id": "4gri784",
+    "type": "ont",
+    "x": 120,
+    "y": 60,
+    "label": "ONT",
+    "props": {
+     "name": "ONT 4"
+    }
+   },
+   {
+    "id": "fm7nprr",
+    "type": "ont",
+    "x": 180,
+    "y": 20,
+    "label": "ONT",
+    "props": {
+     "name": "ONT 5"
+    }
+   }
+  ],
+  "edges": [],
+  "meta": {
+   "config": {},
+   "view": "schema",
+   "tiles": "osm"
+  }
+ }
+}

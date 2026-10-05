@@ -1,0 +1,13 @@
+PASS  1. autosave: a new object reaches the server by itself  — status "Changes — saving…" → "Saved 12:55 PM"
+PASS  2a. no connection: status says the work is kept on this PC  — "No connection — kept on this PC"
+PASS  2b. server still has the old version
+PASS  2c. after restart the last design opens by itself
+PASS  2d. unsaved work is restored and offered  — Unsaved work restored from 12:55 PM. The page was closed or 
+PASS  2e. restored work is then saved to the server  — server has 3 new
+PASS  3. switching design immediately after a change keeps it
+PASS  4a. second tab does not silently overwrite the first  — "Not saved — choose below"
+PASS  4b. 'Save mine as a copy' keeps both versions  — copy "Сохранность A — copy" has 6 objects
+PASS  5a. backup file downloads with all objects  — Сохранность A — backup 2026-10-05.json
+PASS  5b. backup file opens as a new design  — Сохранность A (from file)
+PASS  6. rename is saved
+page errors: none
