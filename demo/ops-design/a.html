@@ -1,0 +1,34 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="common.css"><script src="parts.js"></script></head><body>
+<div class="app" style="grid-template-columns:250px 1fr 470px" id="app"></div>
+<div class="badge">Вариант A — макет</div>
+<script>
+const rows=ONUS.map((r,i)=>`<tr class="${i==0?'sel':''}"><td><i class="dot" style="display:inline-block;background:${r[5].includes('LOS')?'#22c55e':'#22c55e'}"></i></td><td>${r[0]}</td><td class="mono">${r[1]}</td><td class="mono ${r[3]}" style="text-align:right">${r[2]}</td><td class="mono" style="text-align:right">${r[4]}</td><td class="mut">${r[5]}</td></tr>`).join("");
+document.getElementById("app").innerHTML = sidebar() + `
+<div style="display:flex;flex-direction:column;min-width:0">
+ <div class="top"><b style="font-size:14px">PON 0/1/0</b><span class="mut">huawei · GPON · 27 ONU</span><span style="margin-left:auto" class="mut">обновлено 12 с назад</span><span class="btn">⟳ Обновить</span></div>
+ ${statusbar()}
+ <div class="tabs"><span>Topology</span><span>PON ports</span><span class="on">ONU</span><span>Events</span></div>
+ <div style="padding:8px 10px;display:flex;gap:6px"><span class="btn p">Все 27</span><span class="btn">Нет света 0</span><span class="btn">Нет питания 0</span><span class="btn">Слабый сигнал 2</span><span class="btn">Неактивные 0</span><span class="btn" style="margin-left:auto;width:220px;color:#8b98a5">⌕ Серийник, имя…</span></div>
+ <table><tr><th></th><th>Абонент / ONU</th><th>Порт · id</th><th style="text-align:right">Rx dBm</th><th style="text-align:right">Расстояние</th><th>Последнее падение</th></tr>${rows}</table>
+ <div style="margin-top:auto;border-top:1px solid #222c35;padding:10px 14px;height:150px"><b>Лента</b> <span class="mut">— падения ONU · аварии · логи</span>
+  <div class="mono mut" style="margin-top:8px;line-height:1.9">17:21 ↓ Abonent_X 0/0/5 LOSi<br>17:21 ↓ Abonent_Y 0/0/5 LOSi<br>17:20 ↑ Abonent_Z 0/0/4 снова в сети</div></div>
+</div>
+<div style="border-left:1px solid #222c35;background:#0f151b;padding:14px;display:flex;flex-direction:column;gap:12px;overflow:hidden">
+ <div><div class="k">ONU · абонент</div>
+  <div style="font-size:18px;font-weight:700;margin-top:2px">Abonent_A (пример)</div>
+  <div class="mut mono" style="margin-top:2px">huawei › PON 0/1/0 › ONU 7 · HWTCECB8D695</div>
+  <div style="margin-top:8px;display:flex;gap:6px"><span class="pill" style="background:#14532d55;color:#22c55e">● Online</span><span class="pill" style="background:#78350f55;color:#f59e0b">▲ Сигнал на пределе</span></div></div>
+ <div class="card" style="border-color:#f59e0b88;background:#f59e0b10"><b class="warn">Что не так</b><div style="margin-top:4px">Запас всего <b>0.43 dB</b> до предела. ONU может отключиться при любом изгибе или грязном коннекторе.<br><span class="mut">Проверить: коннектор в розетке абонента → патч-корд → сварку в его муфте.</span></div></div>
+ <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+  <div class="kpi"><div class="k">Rx сейчас</div><div class="v warn mono">-26.57</div><div class="s">dBm</div></div>
+  <div class="kpi"><div class="k">Запас</div><div class="v warn mono">0.43</div><div class="s">dB</div></div>
+  <div class="kpi"><div class="k">Расстояние</div><div class="v mono">2985</div><div class="s">м</div></div>
+  <div class="kpi"><div class="k">Падений 24ч</div><div class="v mono">0</div><div class="s">стабильна</div></div></div>
+ <div class="card"><div style="display:flex;align-items:center"><b>Сигнал</b><span style="margin-left:auto" class="mut">6ч · <b class="acc">24ч</b> · 7д</span></div><div style="margin-top:8px">${chart(410,120,-27)}</div></div>
+ <div class="card" style="padding:8px 12px"><table>
+  <tr><td class="mut">Модель</td><td>Huawei 546M</td></tr><tr><td class="mut">Профили</td><td>USER / USER</td></tr>
+  <tr><td class="mut">Последнее падение</td><td>—</td></tr><tr><td class="mut">Данные прочитаны</td><td>56 с назад</td></tr>
+  <tr><td class="mut">Соседи на порту</td><td>27/27 online · средний Rx -22.3</td></tr></table></div>
+ <div style="display:flex;gap:8px"><span class="btn p">Страница ONU</span><span class="btn">Показать на схеме</span><span class="btn">История событий</span></div>
+</div>`;
+</script></body></html>

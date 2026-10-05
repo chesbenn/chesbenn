@@ -1,0 +1,43 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="common.css"><script src="parts.js"></script></head><body>
+<div class="app" style="grid-template-columns:250px 1fr 300px" id="app"></div>
+<div class="badge">Вариант B — макет</div>
+<script>
+document.getElementById("app").innerHTML = sidebar() + `
+<div style="display:flex;flex-direction:column;min-width:0">
+ ${statusbar()}
+ <div style="padding:14px 18px 0">
+  <div class="mut">‹ Назад к списку &nbsp;·&nbsp; Сеть › huawei › PON 0/1/0 › <b style="color:#e6edf3">ONU 7</b></div>
+  <div style="display:flex;align-items:flex-end;gap:14px;margin-top:10px">
+   <div><div style="font-size:24px;font-weight:700">Abonent_A (пример)</div><div class="mut mono">HWTCECB8D695 · Huawei 546M · профиль USER</div></div>
+   <span class="pill" style="background:#14532d55;color:#22c55e;margin-bottom:4px">● Online</span><span class="pill" style="background:#78350f55;color:#f59e0b;margin-bottom:4px">▲ Сигнал на пределе</span>
+   <span style="margin-left:auto;display:flex;gap:8px"><span class="btn">Показать на схеме</span><span class="btn p">Страница ONU</span></span></div>
+  <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:14px">
+   <div class="kpi"><div class="k">Rx сейчас</div><div class="v warn mono">-26.57 <small class="mut">dBm</small></div></div>
+   <div class="kpi"><div class="k">Запас до предела</div><div class="v warn mono">0.43 <small class="mut">dB</small></div></div>
+   <div class="kpi"><div class="k">Расстояние</div><div class="v mono">2985 <small class="mut">м</small></div></div>
+   <div class="kpi"><div class="k">Падений за 7 дней</div><div class="v mono">0</div></div>
+   <div class="kpi"><div class="k">Порт 0/1/0</div><div class="v good mono">27/27</div></div>
+   <div class="kpi"><div class="k">Данные</div><div class="v mono">56 <small class="mut">с назад</small></div></div></div>
+ </div>
+ <div style="display:grid;grid-template-columns:1.7fr 1fr;gap:14px;padding:14px 18px;flex:1;min-height:0">
+  <div style="display:flex;flex-direction:column;gap:14px;min-height:0">
+   <div class="card"><div style="display:flex"><b>Сигнал Rx</b><span style="margin-left:auto" class="mut">6ч · 24ч · <b class="acc">7д</b></span></div><div style="margin-top:10px">${chart(760,210,-27)}</div>
+    <div class="mut" style="margin-top:6px">▲ отметки на графике — падения и восстановления этой ONU</div></div>
+   <div class="card" style="flex:1"><b>События этой ONU</b><div class="mono mut" style="margin-top:8px;line-height:2">04.10 18:12  Rx -26.1 → -26.6 (просел на 0.5 dB)<br>01.10 09:40  перезагрузка ONU (dying-gasp), через 3 мин снова в сети<br>28.09 11:02  ONU зарегистрирована на порту 0/1/0</div></div></div>
+  <div style="display:flex;flex-direction:column;gap:14px">
+   <div class="card" style="border-color:#f59e0b88;background:#f59e0b10"><b class="warn" style="font-size:13px">Диагноз</b>
+    <div style="margin-top:6px">Сигнал у самого предела: запас <b>0.43 dB</b>. Соседи на порту в норме, значит проблема на <b>отводе этого абонента</b>, а не на магистрали.</div>
+    <div style="margin-top:8px"><b>Что проверить по порядку</b><ol style="margin:4px 0 0 16px;line-height:1.8"><li>Коннектор в розетке и на ONU</li><li>Патч-корд, изгибы</li><li>Сварка в его муфте</li></ol></div></div>
+   <div class="card"><b>Сравнение с соседями</b><div style="margin-top:8px;line-height:1.9"><span class="mut">Средний Rx порта</span> <b class="mono" style="float:right">-22.3</b><br><span class="mut">Этот абонент</span> <b class="mono warn" style="float:right">-26.57</b><br><span class="mut">Хуже среднего на</span> <b class="mono warn" style="float:right">4.3 dB</b></div></div>
+   <div class="card"><b>По проекту</b><div class="mut" style="margin-top:6px">Схема «Ереван-центр»: ожидаемый Rx -23.8 dBm → факт хуже на 2.8 dB</div></div></div>
+ </div>
+</div>
+<div style="border-left:1px solid #222c35;background:#0f151b;padding:14px;display:flex;flex-direction:column;gap:10px">
+ <div class="k">Что сломано сейчас · вся сеть</div>
+ <div class="card" style="border-color:#ef444488;background:#ef444410"><b class="crit">✂ PON 0/0/5</b><div>13 из 28 ONU потеряли свет разом · 17:21</div><div class="mut">ветка после сплиттера</div></div>
+ <div class="card" style="border-color:#ef444488;background:#ef444410"><b class="crit">✂ PON 0/0/4</b><div>14 из 29 ONU без света · 16:58</div><div class="mut">ветка после сплиттера</div></div>
+ <div class="card"><b>Одиночные</b><div class="mut">27 ONU потеряли свет по одной — отводы абонентов</div></div>
+ <div class="card"><b class="warn">Слабый сигнал · 11</b><div class="mono mut" style="line-height:1.8;margin-top:4px">Abonent_A -26.57<br>Abonent_I -25.20<br>Abonent_K -25.11</div></div>
+ <div class="card"><b>OLT huawei</b><div class="mut">CPU 38% · RAM 7% · 45 °C · аптайм 4 д</div></div>
+</div>`;
+</script></body></html>
