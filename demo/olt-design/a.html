@@ -1,0 +1,56 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="common.css"><script src="olt-data.js"></script>
+<style>
+.app{grid-template-columns:170px 1fr 330px}
+.hero{display:flex;gap:18px;align-items:center;padding:14px 18px;border-bottom:1px solid #222c35;background:linear-gradient(180deg,#121a22,#0f151b)}
+.chassis{background:#1b232c;border:1px solid #33414e;border-radius:8px;padding:6px;width:560px}
+.slot{display:flex;align-items:center;gap:6px;height:26px;padding:0 8px;border-bottom:1px solid #26313b;font-size:10px;color:#8b98a5}
+.slot:last-child{border:0}.slot b{color:#cfd8e1;width:92px;font-weight:600}
+.port{width:22px;height:16px;border-radius:3px;border:1px solid #0006;display:flex;align-items:center;justify-content:center;font-size:8px;color:#04121d;font-weight:700}
+.port.sel{outline:2px solid #fff;outline-offset:1px}
+.kpis{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;padding:12px 18px}
+.main{display:grid;grid-template-columns:1fr 430px;gap:12px;padding:0 18px 12px}
+.prop{background:#11171d;border-left:1px solid #222c35;padding:14px}
+.prop h5{font-size:10px;letter-spacing:.1em;color:#8b98a5;text-transform:uppercase;margin:14px 0 6px}
+.pr{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #1d262e}
+.bar{height:6px;border-radius:3px;background:#26313b;overflow:hidden;display:flex}
+</style></head><body><div class="app" id="app"></div>
+<script>
+const sel="0/0/4";
+const pc=(x)=>VC[verdict(x)];
+const slot=(name,card,ports)=>`<div class="slot"><b>${name} ${card}</b>${ports}</div>`;
+const pp=(t)=>PORTS.filter(x=>x.t===t).map(x=>`<div class="port ${x.p===sel?'sel':''}" style="background:${pc(x)}">${x.p.split('/')[2]}</div>`).join("");
+const tot=PORTS.reduce((a,x)=>a+x.tot,0),on=PORTS.reduce((a,x)=>a+x.on,0),off=tot-on;
+const k=(l,v,s,c,sp)=>`<div class="kpi"><div class="k">${l}</div><div class="v" style="color:${c||'#e6edf3'}">${v}</div><div class="s">${s}</div>${sp||''}</div>`;
+const rows=PORTS.map(x=>{const v=verdict(x);const w=x.tot?x.on/x.tot*100:0;return `<tr class="${x.p===sel?'sel':''}"><td><span class="dot" style="display:inline-block;background:${VC[v]}"></span></td><td class="mono">${x.p}</td><td class="mut">${x.t}</td>
+<td style="width:150px"><div class="bar"><div style="width:${w}%;background:#22c55e"></div><div style="width:${x.tot?100-w:0}%;background:#ef4444"></div></div></td><td>${x.tot?`<b>${x.on}</b><span class="mut">/${x.tot}</span>`:'<span class="mut">unused</span>'}</td>
+<td class="${x.off?'crit':'mut'}">${x.off||'—'}</td><td class="mono">${x.avg??'—'}</td><td class="mono ${x.worst!=null&&x.worst<=-28?'crit':x.worst!=null&&x.worst<=-26?'warn':''}">${x.worst??'—'}</td><td>${x.tot?spark(x.tot,90,18,VC[v]):''}</td></tr>`}).join("");
+const onus=[["HWTC9A1F22D0","Aram Petrosyan","online","-24.8"],["HWTC9A1F2311","Lilit Hakobyan","LOS 12m","—"],["HWTC9A1F2A07","Gor Sargsyan","LOS 12m","—"],["HWTC9A1F1C55","Ani Grigoryan","dying gasp","—"],["HWTC9A1F3B19","Narek Avetisyan","online","-30.0"],["HWTC9A1F44E2","Mane Karapetyan","online","-26.4"],["HWTC9A1F12A8","Davit Mkrtchyan","LOS 12m","—"]];
+document.getElementById("app").innerHTML=leftnav()+`<div style="display:flex;flex-direction:column;min-width:0">
+<div class="hero">
+ <div><div class="mut" style="font-size:11px">Devices ›</div><div style="font-size:22px;font-weight:700">huawei OLT <span class="pill" style="background:#22c55e22;color:#22c55e">● Online</span></div>
+ <div class="mut">MA5608T · 10.10.0.3 · up 4d 5h · polled 12 s ago · read-only</div>
+ <div style="margin-top:8px;display:flex;gap:6px"><span class="btn">Open in Operations</span><span class="btn">Show on map</span><span class="btn">Backups</span></div></div>
+ <div style="margin-left:auto"><div class="k" style="margin-bottom:4px">Front panel — click a port</div><div class="chassis">
+ ${slot("0/0","H808EPSD",pp("EPON"))}${slot("0/1","H807GPBD",pp("GPON"))}${slot("0/2","H801MCUD","<span>control · CPU 38% · 45°C</span>")}${slot("0/4","H801MPWD","<span class=good>power OK</span>")}</div></div>
+</div>
+<div class="kpis">${k("ONU online",`${on}<span class=mut style="font-size:13px">/${tot}</span>`,"64% of clients",null,spark(1,120,20,"#22c55e"))}${k("Lost light now",44,"LOS on 9 ports","#ef4444",spark(2,120,20,"#ef4444"))}${k("Power off","3","dying gasp","#f59e0b")}${k("Outages","2","0/0/4, 0/0/5 · 12 min","#ef4444")}
+${k("Weak Rx","6","≤ −26 dBm","#f59e0b")}${k("CPU","38%","5 min avg",null,spark(3,120,20))}${k("Memory","7%","of 512 MB",null,spark(4,120,20))}${k("Temperature","45°C","max 68°C",null,spark(5,120,20,"#f59e0b"))}</div>
+<div class="tabs" style="margin:0 18px"><span class="on">Overview</span><span>PON ports</span><span>ONU (169)</span><span>Performance</span><span>Events</span><span>Config</span></div>
+<div class="main" style="margin-top:12px">
+ <div class="card" style="padding:0;overflow:hidden"><div style="padding:10px 12px;display:flex"><b>PON ports</b><span class="mut" style="margin-left:8px">16 ports · 14 in use</span><span class="mut" style="margin-left:auto">sorted by problems ▾</span></div>
+ <table><tr><th></th><th>Port</th><th>Type</th><th>Online</th><th></th><th>Offline</th><th>Avg Rx</th><th>Worst</th><th>24 h</th></tr>${rows}</table></div>
+ <div class="card"><div style="display:flex;align-items:center"><b class="mono" style="font-size:15px">PON 0/0/4</b><span class="pill" style="background:#ef444422;color:#ef4444;margin-left:8px">Outage · 14 lost light</span></div>
+ <div class="mut" style="margin:4px 0 10px">14 ONUs dropped within 40 s at 11:52 — likely fibre cut after splitter. Card power OK.</div>
+ <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px">${k("Online","15/29","",'#22c55e')}${k("Avg Rx","−24.2","dBm")}${k("Worst","−30.0","dBm",'#ef4444')}</div>
+ <div class="k" style="margin-bottom:4px">Rx distribution</div>
+ <div style="display:flex;align-items:flex-end;gap:4px;height:70px;margin-bottom:12px">${[1,2,4,5,2,0,1].map((v,i)=>`<div style="flex:1;height:${v*14+2}px;background:${i<4?'#22c55e':i<6?'#f59e0b':'#ef4444'};border-radius:3px 3px 0 0"></div>`).join("")}</div>
+ <table>${onus.map(o=>`<tr><td class="mono" style="font-size:11px">${o[0]}</td><td>${o[1]}</td><td class="${o[2]=='online'?'good':o[2]=='dying gasp'?'warn':'crit'}">${o[2]}</td><td class="mono">${o[3]}</td></tr>`).join("")}</table>
+ <div class="acc" style="margin-top:8px">All 29 ONUs on this port →</div></div>
+</div></div>
+<div class="prop"><b style="font-size:14px">Device</b>
+<h5>Overview</h5>${[["Model","Huawei MA5608T"],["IP","10.10.0.3"],["Firmware","MA5600V800R018"],["Serial","2102351…7K"],["Uptime","4d 5h 12m"],["Location","Node Avan-3"]].map(r=>`<div class="pr"><span class="mut">${r[0]}</span><span>${r[1]}</span></div>`).join("")}
+<h5>Monitoring</h5>${[["SNMP poll","5.9 s · every 60 s"],["ONU poll","every 5 min"],["Traps","receiving"],["Access","read-only"]].map(r=>`<div class="pr"><span class="mut">${r[0]}</span><span>${r[1]}</span></div>`).join("")}
+<h5>Uplink traffic</h5><div>${area(300,70,"#38bdf8",1)}</div><div class="mut" style="display:flex;justify-content:space-between"><span>↓ 1.42 Gb/s</span><span>↑ 212 Mb/s</span></div>
+<h5>Recent events</h5>${[["11:52","crit","0/0/4 — 14 ONUs lost light"],["11:51","crit","0/0/5 — 9 ONUs lost light"],["10:03","warn","0/1/4 — ONU Rx −30.0 dBm"],["08:40","good","0/0/3 — 2 ONUs back online"]].map(e=>`<div class="pr" style="justify-content:flex-start;gap:8px"><span class="mut mono">${e[0]}</span><span class="dot" style="background:var(--x);margin-top:4px;background:${e[1]=='crit'?'#ef4444':e[1]=='warn'?'#f59e0b':'#22c55e'}"></span><span>${e[2]}</span></div>`).join("")}
+</div>`;
+</script><div class="badge">Variant A · UniFi-style device page · mockup</div></body></html>

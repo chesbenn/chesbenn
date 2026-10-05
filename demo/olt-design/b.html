@@ -1,0 +1,39 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="common.css"><script src="olt-data.js"></script>
+<style>
+.app{grid-template-columns:170px 1fr 320px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:12px 16px}
+.t{font-weight:600;margin-bottom:8px;display:flex;align-items:center}.t .mut{margin-left:auto;font-weight:400;font-size:11px}
+.tile{min-width:0;overflow:hidden;border-radius:10px;padding:8px 8px;color:#04121d;height:84px;display:flex;flex-direction:column}
+.tile .n{font-size:18px;font-weight:800;margin-top:auto}
+.rail{background:#11171d;border-left:1px solid #222c35;padding:14px;overflow:hidden}
+.iss{border:1px solid #222c35;border-left:3px solid;border-radius:8px;padding:9px 10px;margin-bottom:8px;background:#141b22}
+</style></head><body><div class="app" id="app"></div>
+<script>
+const tot=PORTS.reduce((a,x)=>a+x.tot,0),on=PORTS.reduce((a,x)=>a+x.on,0);
+const seg=[["Online",on,"#22c55e"],["Lost light",44,"#ef4444"],["Power off",3,"#f59e0b"],["Inactive >24h",13,"#4b5563"]];
+function donut(){let a=0,s="";const R=58,C=2*Math.PI*R;for(const [,v,c] of seg){const l=v/tot*C;s+=`<circle r="${R}" cx="75" cy="75" fill="none" stroke="${c}" stroke-width="18" stroke-dasharray="${l} ${C-l}" stroke-dashoffset="${-a}" transform="rotate(-90 75 75)"/>`;a+=l}
+return `<svg width="150" height="150">${s}<text x="75" y="72" text-anchor="middle" fill="#e6edf3" font-size="26" font-weight="800">${on}</text><text x="75" y="92" text-anchor="middle" fill="#8b98a5" font-size="11">of ${tot} online</text></svg>`}
+const gauge=(l,v,c,sub)=>`<div style="text-align:center"><svg width="110" height="64"><path d="M10,58 A45,45 0 0 1 100,58" fill="none" stroke="#26313b" stroke-width="10" stroke-linecap="round"/><path d="M10,58 A45,45 0 0 1 100,58" fill="none" stroke="${c}" stroke-width="10" stroke-linecap="round" stroke-dasharray="${v/100*141} 200"/><text x="55" y="55" text-anchor="middle" fill="#e6edf3" font-size="17" font-weight="700">${l}</text></svg><div class="mut">${sub}</div></div>`;
+const tiles=PORTS.map(x=>{const v=verdict(x);return `<div class="tile" style="background:${VC[v]}${v==='unused'?';color:#cfd8e1':''}"><div class="mono" style="font-weight:700">${x.p}</div><div style="font-size:10px;opacity:.8;white-space:nowrap">${x.t}${x.worst!=null?" "+x.worst:""}</div><div class="n">${x.tot?x.on+'<span style="font-size:12px;opacity:.75">/'+x.tot+'</span>':'—'}</div></div>`}).join("");
+const hist=[[-14,2],[-16,3],[-18,8],[-20,17],[-22,26],[-24,31],[-26,14],[-28,4],[-30,4]];
+const hb=hist.map(([d,v])=>`<div style="flex:1;text-align:center"><div style="height:${v*3.6}px;background:${d>-26?'#22c55e':d>-28?'#f59e0b':'#ef4444'};border-radius:4px 4px 0 0;margin:0 3px"></div><div class="mut" style="font-size:9px;margin-top:3px">${d}</div></div>`).join("");
+document.getElementById("app").innerHTML=leftnav()+`<div style="min-width:0">
+<div class="top"><div><div style="font-size:17px;font-weight:700">huawei OLT</div><div class="mut" style="font-size:11px">MA5608T · 10.10.0.3</div></div>
+<span class="pill" style="background:#22c55e22;color:#22c55e">● Online · 4d 5h</span><span class="pill" style="background:#ef444422;color:#ef4444">2 outages now</span>
+<div style="margin-left:auto;display:flex;gap:6px"><span class="btn">Last 24 h ▾</span><span class="btn">Operations</span><span class="btn">⋯</span></div></div>
+<div class="tabs"><span class="on">Dashboard</span><span>PON ports</span><span>ONU list</span><span>Optics</span><span>Performance</span><span>Events</span><span>Settings</span></div>
+<div class="grid">
+ <div class="card"><div class="t">ONU state</div><div style="display:flex;align-items:center;gap:14px">${donut()}<div>${seg.map(s=>`<div style="display:flex;gap:7px;align-items:center;margin:5px 0"><span class="dot" style="background:${s[2]}"></span>${s[0]}<b style="margin-left:6px">${s[1]}</b></div>`).join("")}</div></div></div>
+ <div class="card"><div class="t">Health</div><div style="display:flex;justify-content:space-around;margin-top:6px">${gauge("38%",38,"#38bdf8","CPU")}${gauge("7%",7,"#22c55e","Memory")}</div><div style="display:flex;justify-content:space-around;margin-top:6px">${gauge("45°",45,"#f59e0b","Temp")}${gauge("OK",100,"#22c55e","Power")}</div></div>
+ <div class="card" style="grid-column:span 2"><div class="t">Uplink traffic <span class="mut">↓ 1.42 Gb/s · ↑ 212 Mb/s</span></div>${area(700,140,"#38bdf8",1,0.3,0.85).replace('<svg','<svg style="width:100%"')}<div class="mut" style="display:flex;justify-content:space-between;font-size:10px"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>now</span></div></div>
+ <div class="card" style="grid-column:span 2"><div class="t">PON ports <span class="mut">online / total · colour = health</span></div><div style="display:grid;grid-template-columns:repeat(8,1fr);gap:7px">${tiles}</div></div>
+ <div class="card" style="grid-column:span 2"><div class="t">Signal (Rx) distribution <span class="mut">${on} ONUs · dBm</span></div><div style="display:flex;align-items:flex-end;height:130px">${hb}</div><div class="mut" style="font-size:10px;margin-top:6px"><span class=good>●</span> good &gt; −26 · <span class=warn>●</span> weak −26…−28 · <span class=crit>●</span> critical ≤ −28</div></div>
+ <div class="card" style="grid-column:span 2"><div class="t">ONU online, 24 h</div>${area(700,90,"#22c55e",3,0.55,0.75).replace('<svg','<svg style="width:100%"')}</div>
+ <div class="card" style="grid-column:span 2"><div class="t">CPU &amp; temperature, 24 h</div><div style="display:flex;gap:8px">${area(345,90,"#38bdf8",4,0.2,0.5)}${area(345,90,"#f59e0b",5,0.4,0.6)}</div></div>
+</div></div>
+<div class="rail"><div style="font-weight:700;font-size:14px;margin-bottom:10px">Issues <span class="pill" style="background:#ef444422;color:#ef4444">5</span></div>
+${[["#ef4444","Outage on PON 0/0/4","14 of 29 ONUs lost light at 11:52 · fibre","12 min"],["#ef4444","Outage on PON 0/0/5","18 of 31 offline · 9 at once","13 min"],["#f59e0b","3 ONUs power off","dying gasp on 0/0/3, 0/1/0","40 min"],["#f59e0b","6 ONUs weak signal","worst −30.4 dBm on 0/0/6","ongoing"],["#4b5563","13 ONUs inactive > 24 h","maybe disconnected clients","—"]].map(i=>`<div class="iss" style="border-left-color:${i[0]}"><div style="display:flex"><b>${i[1]}</b><span class="mut" style="margin-left:auto;font-size:11px">${i[3]}</span></div><div class="mut" style="margin-top:3px">${i[2]}</div></div>`).join("")}
+<div style="font-weight:700;margin:16px 0 8px">Recent events</div>
+${[["11:52","0/0/4 · 14 ONU LOS"],["11:51","0/0/5 · 9 ONU LOS"],["10:03","0/1/4 · Rx −30.0"],["08:40","0/0/3 · 2 ONU up"],["07:12","config backup saved"]].map(e=>`<div class="pr" style="display:flex;gap:10px;padding:5px 0;border-bottom:1px solid #1d262e"><span class="mut mono">${e[0]}</span>${e[1]}</div>`).join("")}
+</div>`;
+</script><div class="badge">Variant B · UISP-style dashboard · mockup</div></body></html>

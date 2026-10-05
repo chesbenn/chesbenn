@@ -1,0 +1,43 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="common.css"><script src="olt-data.js"></script>
+<style>
+.app{grid-template-columns:170px 1fr 360px}
+.hl{display:flex;align-items:center;gap:18px;padding:0 16px;height:46px;border-bottom:1px solid #222c35;background:#11171d;font-size:12px}
+.hl b{font-size:15px}.sep{color:#33414e}
+td,th{padding:5px 8px}
+.bar{height:8px;border-radius:2px;background:#26313b;overflow:hidden;display:flex;width:120px}
+.exp td{background:#0f151b;padding:0}
+.chip{display:inline-block;padding:1px 7px;border-radius:5px;font-size:11px;font-weight:600}
+.side2{background:#11171d;border-left:1px solid #222c35;padding:12px;overflow:hidden}
+.ev{display:grid;grid-template-columns:44px 8px 1fr;gap:8px;align-items:start;padding:6px 0;border-bottom:1px solid #1d262e}
+</style></head><body><div class="app" id="app"></div>
+<script>
+const tot=PORTS.reduce((a,x)=>a+x.tot,0),on=PORTS.reduce((a,x)=>a+x.on,0);
+const order={bad:0,warn:1,ok:2,unused:3};
+const ps=[...PORTS].sort((a,b)=>order[verdict(a)]-order[verdict(b)]||b.off-a.off);
+const chip=(n,c)=>n?`<span class="chip" style="background:${c}22;color:${c}">${n}</span>`:'<span class="mut">—</span>';
+const onus=[["HWTC9A1F22D0","Aram Petrosyan","#22c55e","online","-24.8","2d 4h"],["HWTC9A1F2311","Lilit Hakobyan","#ef4444","LOS","—","12 min"],["HWTC9A1F2A07","Gor Sargsyan","#ef4444","LOS","—","12 min"],["HWTC9A1F1C55","Ani Grigoryan","#f59e0b","power off","—","40 min"],["HWTC9A1F3B19","Narek Avetisyan","#22c55e","online","-30.0","6d 1h"]];
+const sub=`<tr class="exp"><td colspan="11"><div style="padding:8px 12px 10px 40px;border-left:3px solid #ef4444">
+<div style="display:flex;gap:16px;margin-bottom:6px"><b>14 ONUs dropped within 40 s at 11:52</b><span class="mut">→ fibre break after splitter SP-4 (Optical Designer)</span><span class="acc" style="margin-left:auto">Open all 29 ONUs →</span></div>
+<table>${onus.map(o=>`<tr><td style="width:14px"><span class="dot" style="display:inline-block;background:${o[2]}"></span></td><td class="mono" style="font-size:11px">${o[0]}</td><td>${o[1]}</td><td style="color:${o[2]}">${o[3]}</td><td class="mono">${o[4]}</td><td class="mut">${o[5]}</td><td class="acc">details</td></tr>`).join("")}</table></div></td></tr>`;
+const rows=ps.map(x=>{const v=verdict(x),w=x.tot?x.on/x.tot*100:0,open=x.p==="0/0/4";
+return `<tr class="${open?'sel':''}"><td class="mut">${x.tot?(open?'▾':'▸'):''}</td><td><span class="dot" style="display:inline-block;background:${VC[v]}"></span></td><td class="mono"><b>${x.p}</b></td><td class="mut">${x.t}</td>
+<td>${x.tot?`<div style="display:flex;align-items:center;gap:8px"><div class="bar"><div style="width:${w}%;background:#22c55e"></div><div style="width:${100-w}%;background:#ef4444"></div></div><span><b>${x.on}</b><span class="mut">/${x.tot}</span></span></div>`:'<span class="mut">not used</span>'}</td>
+<td>${chip(x.off,"#ef4444")}</td><td>${chip(x.weak,"#f59e0b")}</td><td>${chip(x.crit,"#ef4444")}</td><td class="mono">${x.avg??'—'}</td><td class="mono ${x.worst!=null&&x.worst<=-28?'crit':''}">${x.worst??'—'}</td><td>${x.tot?spark(x.tot+1,100,18,VC[v]):''}</td></tr>${open?sub:''}`}).join("");
+document.getElementById("app").innerHTML=leftnav()+`<div style="min-width:0;display:flex;flex-direction:column">
+<div class="hl"><span class="dot" style="background:#22c55e;width:10px;height:10px"></span><b>huawei OLT</b><span class="mut">MA5608T · 10.10.0.3</span><span class="sep">|</span>
+<span>CPU <b style="font-size:12px">38%</b></span><span>RAM <b style="font-size:12px">7%</b></span><span>Temp <b style="font-size:12px" class="warn">45°C</b></span><span>Up <b style="font-size:12px">4d 5h</b></span><span>Poll <b style="font-size:12px">5.9 s</b> <span class="mut">12 s ago</span></span><span>Uplink <b style="font-size:12px">↓1.42G ↑212M</b></span>
+<span style="margin-left:auto" class="btn">Operations</span><span class="btn">⋯</span></div>
+<div style="display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid #222c35">
+${[["ONU online",`${on}/${tot}`,"#22c55e"],["Lost light",44,"#ef4444"],["Power off",3,"#f59e0b"],["Weak / critical Rx","6 / 4","#f59e0b"],["Inactive > 24 h",13,"#8b98a5"]].map((k,i)=>`<div style="padding:8px 14px;${i?'border-left:1px solid #222c35':''}"><div class="k">${k[0]}</div><div class="v" style="color:${k[2]}">${k[1]}</div></div>`).join("")}</div>
+<div class="tabs"><span class="on">PON ports</span><span>All ONUs</span><span>Optics</span><span>Graphs</span><span>Events</span><span>Hardware</span><span>Config</span>
+<span style="margin-left:auto" class="btn">🔍 Find ONU by SN, name, MAC…</span><span class="btn">Problems only</span></div>
+<div style="padding:0 6px;overflow:hidden"><table><tr><th></th><th></th><th>Port</th><th>Type</th><th>Online</th><th>LOS</th><th>Weak</th><th>Critical</th><th>Avg Rx</th><th>Worst Rx</th><th>Online, 24 h</th></tr>${rows}</table></div>
+</div>
+<div class="side2"><div style="display:flex;align-items:center;margin-bottom:8px"><b style="font-size:14px">Incidents now</b><span class="pill" style="background:#ef444422;color:#ef4444;margin-left:8px">2</span></div>
+${[["PON 0/0/4 — fibre","14 ONUs at 11:52 · 12 min"],["PON 0/0/5 — fibre","9 ONUs at 11:51 · 13 min"]].map(i=>`<div class="card" style="border-left:3px solid #ef4444;padding:9px 10px;margin-bottom:8px"><b>${i[0]}</b><div class="mut">${i[1]}</div></div>`).join("")}
+<b style="display:block;margin:14px 0 6px;font-size:14px">Events</b>
+${[["11:52","#ef4444","0/0/4 · 14 ONUs lost light"],["11:51","#ef4444","0/0/5 · 9 ONUs lost light"],["11:20","#f59e0b","0/1/0 · HWTC…1C55 power off"],["10:03","#f59e0b","0/1/4 · Rx −30.0 dBm"],["09:15","#22c55e","0/1/2 · ONU registered"],["08:40","#22c55e","0/0/3 · 2 ONUs back"],["07:12","#38bdf8","config backup saved"],["05:02","#8b98a5","SNMP poll slow 9.8 s"]].map(e=>`<div class="ev"><span class="mut mono">${e[0]}</span><span class="dot" style="background:${e[1]};margin-top:4px"></span><span>${e[2]}</span></div>`).join("")}
+<b style="display:block;margin:14px 0 6px;font-size:14px">Hardware</b>
+${[["0/0 H808EPSD","8 EPON · normal"],["0/1 H807GPBD","8 GPON · normal"],["0/2 H801MCUD","control · active"],["0/4 H801MPWD","power · normal"]].map(h=>`<div style="display:flex;padding:4px 0;border-bottom:1px solid #1d262e"><span class="mono">${h[0]}</span><span class="good" style="margin-left:auto">${h[1]}</span></div>`).join("")}
+</div>`;
+</script><div class="badge">Variant C · NOC compact (SmartOLT-style) · mockup</div></body></html>

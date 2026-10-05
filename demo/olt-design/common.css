@@ -1,0 +1,25 @@
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1700px;height:950px;background:#0b1015;color:#e6edf3;font:12px/1.4 Inter,system-ui,sans-serif;overflow:hidden}
+.mono{font-family:ui-monospace,Menlo,monospace}
+.mut{color:#8b98a5}.good{color:#22c55e}.warn{color:#f59e0b}.crit{color:#ef4444}.acc{color:#38bdf8}
+.app{display:grid;height:950px}
+.side{background:#11171d;border-right:1px solid #222c35;padding:12px 10px}
+.side h4{font-size:10px;letter-spacing:.1em;color:#8b98a5;margin:14px 6px 6px;text-transform:uppercase}
+.row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;font-size:12px}
+.row.sel{background:#16324a}.row .c{margin-left:auto;color:#8b98a5;font-size:11px}
+.dot{width:8px;height:8px;border-radius:50%;flex:none}
+.ind{padding-left:22px}
+.top{height:54px;display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid #222c35;background:#11171d}
+.status{display:grid;grid-template-columns:1.6fr repeat(5,1fr);border-bottom:1px solid #222c35;background:#11171d}
+.status>div{padding:8px 12px;border-left:1px solid #222c35}.status>div:first-child{border:0}
+.k{font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:#8b98a5}.v{font-size:17px;font-weight:700}.s{font-size:10px;color:#8b98a5}
+.tabs{display:flex;gap:4px;padding:0 10px;border-bottom:1px solid #222c35;height:38px;align-items:center}
+.tabs span{padding:9px 10px;color:#8b98a5}.tabs .on{color:#e6edf3;border-bottom:2px solid #38bdf8}
+.card{background:#141b22;border:1px solid #222c35;border-radius:12px;padding:12px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:600}
+table{width:100%;border-collapse:collapse}td,th{padding:7px 8px;border-bottom:1px solid #1d262e;text-align:left;white-space:nowrap}th{font-size:10px;color:#8b98a5;font-weight:500;text-transform:uppercase;letter-spacing:.06em}
+tr.sel td{background:#16324a}
+.kpi{background:#0f151b;border:1px solid #222c35;border-radius:10px;padding:9px 11px}.kpi .v{font-size:19px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border:1px solid #2b3742;border-radius:8px;background:#18212a;font-size:12px}
+.btn.p{background:#0ea5e9;border-color:#0ea5e9;color:#04121d;font-weight:600}
+.badge{position:fixed;right:14px;bottom:10px;background:#f59e0b;color:#111;font-weight:700;padding:4px 10px;border-radius:6px;font-size:11px}
